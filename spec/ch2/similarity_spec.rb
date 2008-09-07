@@ -1,14 +1,11 @@
-require 'rubygems'
-require 'spec'
-require 'set'
-
-require '../similarity'
+require File.dirname(__FILE__) + '/../spec_helper'
+require 'ch2/similarity'
 
 
 module SimilaritySpecHelpers
   
   def sum_of_squared_differences c1, c2
-    shared_items = ( Set.new(c1.keys) & Set.new(c2.keys) ).to_a
+    shared_items = c1.keys & c2.keys
     differences = shared_items.map{ |item| c1[item] - c2[item] }
     squared_differences = differences.map{|diff| diff ** 2 }
     sum = 0
@@ -33,14 +30,18 @@ describe Similarity, "ecludiean similarity" do
     }
   end
   
-  it 'should calculate correct sum of squared differences' do
-    c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-    Similarity.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
+  describe 'ecludiean distance similarity' do
+    
+    it 'should calculate correct sum of squared differences' do
+      c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
+      Similarity.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
+    end
+  
+    it 'should calculate ecludiean similarity as 1 / (1 + sum_of_squared_differences)' do
+      c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
+      Similarity.distance_similarity( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
+    end
+    
   end
   
-  it 'should calculate ecludiean similarity as 1 / (1 + sum_of_squared_differences)' do
-    c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-    Similarity.distance_similarity( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
-  end
-
 end
