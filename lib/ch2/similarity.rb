@@ -13,7 +13,7 @@ module Similarity
   
   
   # === Ecludiean Distance
-  # * Ecludiean distance measures the similarity of two subjects by measuring the closeness of their preference scores.
+  # * Ecludiean distance measures the similarity of two subjects by measuring the closeness of each of their preference scores.
   # * The heuristic is calculated by summing up the differences of two subjects' scores.
   # * Since we want a positive number we'll square those differences.
   # * Two subjects are more similar if their sum of score differences is smaller.
@@ -35,13 +35,18 @@ module Similarity
   end
   
   
-  # 
   # Since we want a higher score to represent more similiarity between the subjects, we'll simpliy take the inverse the ecludiean_distance. 
   # And, to prevent division by zero we'll add 1 to the denominator.
   # <em>Book Reference</em>:: <tt>sim_distance()</tt> in book.
+  #
+  # ==== Formula:
+  #       1 / ( 1 + √( ∑(x-y)^2 ) )
+  #
+  # ==== Parmamters:
+  # <tt>x, y</tt>:: {"item" => score}
+  #
   # ==== Returns:
-  # * Distance similarity will always return a number b/w (0, 1]
-  # * 1 / ( 1 + √( ∑(x-y)^2 ) )
+  # Distance similarity will always return a number b/w (0, 1]
   def self.distance_similarity( x, y )
     # note you don't need a root here, since we are only looking for inverse difference
     # as long as we are comparing everything to the same scale we're ok
@@ -56,6 +61,9 @@ module Similarity
   #
   # ==== Formula:
   #     r = ( ∑x∙y - ∑x∙∑y/n ) / √( (∑x^2 - (∑x)^2/n) ∙ (∑y^2 - (∑y)^2/n) )
+  #
+  # ==== Parmamters:
+  # <tt>x, y</tt>:: {"item" => score}
   #
   # ==== Returns:
   # Pearson Score is between [-1, 1]:
@@ -88,9 +96,5 @@ module Similarity
   class << self
      alias :linear_similarity :pearson_similarity
   end
-  
-  
-  
-  
   
 end
