@@ -34,12 +34,12 @@ describe Similarity, "ecludiean similarity" do
     
     it 'should calculate correct sum of squared differences' do
       c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-      Similarity.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
+      Similarity::Metrics.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
     end
   
     it 'should calculate ecludiean similarity as 1 / (1 + sum_of_squared_differences)' do
       c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-      Similarity.distance_similarity( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
+      Similarity::Metrics.distance_similarity( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
     end
     
   end
