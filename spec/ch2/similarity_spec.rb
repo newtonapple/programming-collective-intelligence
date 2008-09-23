@@ -49,22 +49,27 @@ describe Similarity do
   
   describe 'top_matches' do
     it 'finds top similar subjects / critics' do
-      top_matches = Similarity.top_matches(@critics, 'Toby', 3)
+      top_matches = Similarity::Recommendations.top_matches(@critics, 'Toby', 3)
       top_matches.size.should == 3
       top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig']
     end
     
     it 'return maximum items when n > maximum size of critics - 1 (excluding self)' do
-      top_matches = Similarity.top_matches(@critics, 'Toby', 100)
+      top_matches = Similarity::Recommendations.top_matches(@critics, 'Toby', 100)
       top_matches.size.should == @critics.size - 1
     end
   end
   
   describe 'get_recommendations' do
     it 'finds top recommened items' do
-      recommended_items = Similarity.get_recommendations( @critics, 'Toby') 
-      puts recommended_items.inspect
+      recommended_items = Similarity::Recommendations.top_item_matches( @critics, 'Toby') 
       recommended_items.map{|recommeded| recommeded.first}.should == [ 'The Night Listener', 'Lady in the Water', 'Just My Luck']
     end
+    
+    it 'finds top recommened items' do
+      recommended_items = Similarity::Recommendations.get_recommendations( @critics, 'Toby', 2) 
+      recommended_items.map{|recommeded| recommeded.first}.should == [ 'The Night Listener', 'Lady in the Water']
+    end
+    
   end
 end
