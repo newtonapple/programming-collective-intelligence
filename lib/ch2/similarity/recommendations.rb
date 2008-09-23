@@ -19,8 +19,9 @@ module Similarity
 
 
     def self.subject_matches(preferences, subject, similarity_metric='pearson_similarity')
-      results = []
+      results             = []
       subject_item_scores = preferences[subject]
+      
       preferences.each do |other_subject, other_item_scores|
         if other_subject != subject # compute similarity score if not the same subjects
           results << [other_subject, Metrics.send(similarity_metric, subject_item_scores, other_item_scores)]
@@ -30,22 +31,22 @@ module Similarity
     end
 
     def self.item_matches(preferences, subject, similarity_metric='pearson_similarity')
-      subject_item_scores = preferences[subject]
       sum_of_weighted_item_scores = Hash.new(0)  # TODO: combine the two hashes into one
-      sum_of_sim_scores = Hash.new(0)
+      sum_of_sim_scores           = Hash.new(0)
+      subject_item_scores         = preferences[subject]
 
       similarity_scores = subject_matches(preferences, subject, similarity_metric)
       similarity_scores.each do |other_subject, sim_score|
         next if sim_score < 0 # skip negatives
         disjoint_items(preferences[other_subject], subject_item_scores).each do |item| # any items that don't belong to subject
-          item_score = preferences[other_subject][item]
+          item_score                         = preferences[other_subject][item]
           sum_of_weighted_item_scores[item] += ( sim_score * item_score )
-          sum_of_sim_scores[item] += sim_score 
+          sum_of_sim_scores[item]           += sim_score 
         end
       end
 
       sum_of_weighted_item_scores.collect do |item, weighted_item_score|
-        [item, weighted_item_score / sum_of_sim_scores[item]]  # normalize weight so most reviewed items will not dominate
+        [ item, weighted_item_score / sum_of_sim_scores[item] ]  # normalize weight so most reviewed items will not dominate
       end
     end
 

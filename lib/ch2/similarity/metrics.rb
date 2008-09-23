@@ -67,18 +67,17 @@ module Similarity
       xy_sum_of_products = x_sum = y_sum = x_sum_of_squared = y_sum_of_squared = 0
     
       common_items.each do |item| 
-        x_score, y_score = x[item], y[item]
+        x_score, y_score    = x[item], y[item]
+        x_sum              += x_score
+        y_sum              += y_score
+        x_sum_of_squared   += (x_score ** 2)
+        y_sum_of_squared   += (y_score ** 2)
         xy_sum_of_products += (x_score * y_score)
-        x_sum += x_score
-        y_sum += y_score
-        x_sum_of_squared += (x_score ** 2)
-        y_sum_of_squared += (y_score ** 2)
       end
     
       individual_variants = Math.sqrt( (x_sum_of_squared - x_sum ** 2 / n) * (y_sum_of_squared - y_sum ** 2 / n) ) 
       return 0 if individual_variants == 0 # prevent division by zero
       variant = (xy_sum_of_products - x_sum * y_sum / n)
-    
       variant / individual_variants
     end
 
