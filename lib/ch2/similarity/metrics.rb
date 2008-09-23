@@ -59,12 +59,12 @@ module Similarity
     # 1. -1: implies rating/scores of x & y are complete opposite
     # 2.  1: implies x & y rated exactly the same
     # 3.  0: x & y not related
-    def self.pearson_similarity( x, y )
+    def self.linear_similarity( x, y )
       common_items = self.common_items(x, y)
       return 0 if common_items.empty? # nothing is shared
     
       n = common_items.size.to_f
-      xy_sum_of_products, x_sum = y_sum = x_sum_of_squared = y_sum_of_squared = 0
+      xy_sum_of_products = x_sum = y_sum = x_sum_of_squared = y_sum_of_squared = 0
     
       common_items.each do |item| 
         x_score, y_score = x[item], y[item]
@@ -83,7 +83,8 @@ module Similarity
     end
 
     class << self
-      alias :linear_similarity :pearson_similarity
+      alias :pearson_similarity :linear_similarity
+      alias :sim_distance :distance_similarity
     end
     
       private 

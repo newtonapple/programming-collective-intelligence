@@ -15,10 +15,11 @@ module SimilaritySpecHelpers
   
 end
 
-describe Similarity, "ecludiean similarity" do
+describe Similarity do
   include SimilaritySpecHelpers
-  
+
   before :all do
+    # these are critics from the book
     @critics = {
       "Lisa Rose"        => { 'Lady in the Water'=>2.5, 'Snakes on a Plane'=>3.5, 'Just My Luck'=>3.0, 'Superman Returns'=>3.5, 'You, Me and Dupree'=>2.5, 'The Night Listener'=>3.0 },
       "Gene Seymour"     => { 'Lady in the Water'=>3.0, 'Snakes on a Plane'=>3.5, 'Just My Luck'=>1.5, 'Superman Returns'=>5.0, 'You, Me and Dupree'=>3.5, 'The Night Listener'=>3.0 },
@@ -30,18 +31,40 @@ describe Similarity, "ecludiean similarity" do
     }
   end
   
-  describe 'ecludiean distance similarity' do
-    
-    it 'should calculate correct sum of squared differences' do
-      c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-      Similarity::Metrics.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
-    end
+  describe Similarity::Metrics do 
   
-    it 'should calculate ecludiean similarity as 1 / (1 + sum_of_squared_differences)' do
-      c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
-      Similarity::Metrics.distance_similarity( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
+    describe 'ecludiean distance similarity' do
+      it 'calculates correct sum of squared differences' do
+        c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
+        Similarity::Metrics.ecludiean_distance( c1, c2 ).should == sum_of_squared_differences(c1,c2)
+      end
+  
+      it 'calculates ecludiean similarity as 1 / (1 + sum_of_squared_differences)' do
+        c1, c2 = @critics['Lisa Rose'], @critics['Gene Seymour']
+        Similarity::Metrics.sim_distance( c1, c2 ).should == ( 1 / ( 1 + sum_of_squared_differences(c1,c2) ) )
+      end
     end
     
   end
   
+  describe 'top_matches' do
+    it 'finds top similar subjects / critics' do
+      top_matches = Similarity.top_matches(@critics, 'Toby', 3)
+      top_matches.size.should == 3
+      top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig']
+    end
+    
+    it 'return maximum items when n > maximum size of critics - 1 (excluding self)' do
+      top_matches = Similarity.top_matches(@critics, 'Toby', 100)
+      top_matches.size.should == @critics.size - 1
+    end
+  end
+  
+  describe 'get_recommendations' do
+    it 'finds top recommened items' do
+      recommended_items = Similarity.get_recommendations( @critics, 'Toby') 
+      puts recommended_items.inspect
+      recommended_items.map{|recommeded| recommeded.first}.should == [ 'The Night Listener', 'Lady in the Water', 'Just My Luck']
+    end
+  end
 end
