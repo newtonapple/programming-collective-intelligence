@@ -12,7 +12,32 @@ module SimilaritySpecHelpers
     squared_differences.each{ |sq_diff| sum += sq_diff }
     sum
   end
-  
+    
+    
+  class PreferencesHashMatcher
+    def initialize(hash)
+      @hash = hash
+    end
+    
+    def matches?(preferences)
+      @preferences = preferences
+      @preferences.each do |k1, v1|
+        v1.each do |k2, v2|
+          return false if @hash[k1][k2] != v2
+        end
+      end
+      true 
+    end
+    
+    def failure_message
+      "expected #{@preferences.inspect} == #{@critics.inspect}"
+    end
+  end
+
+  def have_hash_content(hash)
+    PreferencesHashMatcher.new(hash)
+  end
+    
 end
 
 describe Similarity do
@@ -48,13 +73,13 @@ describe Similarity do
   end
   
   describe 'top_matches' do
-    it 'finds top similar subjects / critics' do
+    it 'ranks top similar subjects / critics' do
       top_matches = Similarity::Recommendations.top_matches(@critics, 'Toby', 3)
       top_matches.size.should == 3
-      top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig']
+      top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig'] # same as the book
     end
     
-    it 'return maximum items when n > maximum size of critics - 1 (excluding self)' do
+    it 'returns maximum items when n > maximum size of critics - 1 (excluding self)' do
       top_matches = Similarity::Recommendations.top_matches(@critics, 'Toby', 100)
       top_matches.size.should == @critics.size - 1
     end
@@ -70,6 +95,24 @@ describe Similarity do
       recommended_items = Similarity::Recommendations.get_recommendations( @critics, 'Toby', 2) 
       recommended_items.map{|recommeded| recommeded.first}.should == [ 'The Night Listener', 'Lady in the Water']
     end
-    
   end
+  
+  describe Similarity::Preferences do
+    
+    before :each do
+      @preferences = Similarity::Preferences.new( @critics )
+    end
+    
+    it 'has the same content as initial hash' do
+      @preferences.should have_hash_content(@critics)
+    end
+    
+    it 'ranks top similar subjects' do
+      top_matches = @preferences.top_subject_matches('Toby', 3)
+      top_matches.size.should == 3
+      top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig']
+      
+    end
+  end
+  
 end
