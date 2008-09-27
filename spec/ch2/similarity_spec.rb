@@ -111,7 +111,13 @@ describe Similarity do
       top_matches = @preferences.top_subject_matches('Toby', 3)
       top_matches.size.should == 3
       top_matches.map{|match| match.first}.should == ['Lisa Rose', 'Mick LaSalle', 'Claudia Puig']
-      
+    end
+    
+    it 'can transpose subjects and items' do
+      hash = { :A => {:a=>1, :b=>2}, :B => {:b=>3, :c=>4 }, :C => {:c=>5, :a=>6}}
+      prev = Similarity::Preferences.new hash
+      expected_hash = {:a => {:A=>1, :C=>6}, :b => {:A=>2, :B=>3}, :c=>{:B=>4, :C=>5}}
+      prev.transpose.should have_hash_content(expected_hash)
     end
   end
   
